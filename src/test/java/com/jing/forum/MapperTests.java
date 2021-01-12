@@ -1,7 +1,9 @@
 package com.jing.forum;
 
 
+import com.jing.forum.dao.DiscussPostMapper;
 import com.jing.forum.dao.UserMapper;
+import com.jing.forum.entity.DiscussPost;
 import com.jing.forum.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Date;
+import java.util.List;
 
 @SpringBootTest
 @ContextConfiguration(classes = ForumApplication.class)
@@ -56,7 +59,20 @@ public class MapperTests {
 
         int hello = userMapper.updatePassword(150, "hello");
         System.out.println(hello);
+    }
 
+    @Autowired
+    DiscussPostMapper discussPostMapper;
 
+    @Test
+    public void testSelectPosts() {
+        List<DiscussPost> discussPosts = discussPostMapper.selectDiscussPosts(0, 0, 10);
+        for (DiscussPost discussPost : discussPosts) {
+            System.out.println(discussPost);
+        }
+
+        System.out.println(discussPostMapper.selectDiscussPostRows(0));
+
+        System.out.println(discussPostMapper.selectDiscussPostRows(149));
     }
 }
