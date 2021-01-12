@@ -1,6 +1,7 @@
 package com.jing.forum.service;
 
 import com.jing.forum.dao.AlphaDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,13 @@ import javax.annotation.PreDestroy;
 @Service
 @Scope("singleton")
 public class AlphaService {
+
+    private AlphaDao alphaDao;
+
+    @Autowired
+    public void setAlphaDao(AlphaDao alphaDao) {
+        this.alphaDao = alphaDao;
+    }
 
     @PostConstruct
     public void init() {
@@ -25,5 +33,9 @@ public class AlphaService {
         System.out.println("destroy AlphaService");
     }
 
+
+    public String find() {
+        return alphaDao.select();
+    }
 
 }
