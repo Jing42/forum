@@ -114,4 +114,10 @@ public class AlphaController {
         return list;
     }
 
+
+    @RequestMapping("/sunwenjie")
+    @ResponseBody
+    public String sunwenjie(HttpServletRequest request) {
+        return "sunwenjie";
+    }
 }
