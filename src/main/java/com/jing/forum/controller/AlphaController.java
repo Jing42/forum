@@ -23,9 +23,5 @@ public class AlphaController {
         return alphaService.find();
     }
 
-    @RequestMapping("/hello")
-    @ResponseBody
-    public String sayHello() {
-        return "Hello Spring boot.";
-    }
+
 }
