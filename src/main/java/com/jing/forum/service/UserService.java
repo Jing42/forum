@@ -2,6 +2,7 @@ package com.jing.forum.service;
 
 import com.jing.forum.dao.UserMapper;
 import com.jing.forum.entity.User;
+import com.jing.forum.util.ForumUtil;
 import com.jing.forum.util.MailClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class UserService {
     public Map<String, Object> register(User user) {
         Map<String, Object> map= new HashMap<>();
         if(user == null) {
-            throw new IllegalArgumentException("参数不能为空")；
+            throw new IllegalArgumentException("参数不能为空");
         }
         if(StringUtils.isBlank(user.getUsername())) {
             map.put("usernameMessage", "账号不能为空!");
@@ -51,6 +52,20 @@ public class UserService {
             return map;
         }
 
+        User user1 = userMapper.selectByName(user.getUsername());
+        if(user1 != null) {
+            map.put("usernameMessage", "该账号已存在");
+            return map;
+        }
+
+        User user2 = userMapper.selectByEmail(user.getEmail());
+        if(user2 != null) {
+            map.put("emailMessage", "该邮箱已存在");
+            return map;
+        }
+
+        user.setSalt(ForumUtil.generateUUID().substring(0,5));
+        user.setPassword(ForumUtil.md5(user.getPassword()+user.getSalt()));
 
         return map;
     }
