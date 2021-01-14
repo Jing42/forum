@@ -2,9 +2,14 @@ package com.jing.forum.util;
 
 public interface ForumConstant {
 
-    public final static int ACTIVATION_SUCCESS = 0;
+    int ACTIVATION_SUCCESS = 0;
 
-    public final static int ACTIVATION_REPEAT = 1;
+    int ACTIVATION_REPEAT = 1;
 
-    public final static int ACTIVATION_FALURE = 2;
+    int ACTIVATION_FALURE = 2;
+
+    int DEFAULT_EXPIRED_SECONDS = 3600 * 12;
+
+    int REMEMBER_EXPIRED_SECONDS = 3600 * 24 * 100;
+
 }
