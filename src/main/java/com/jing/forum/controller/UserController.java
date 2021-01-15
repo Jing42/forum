@@ -1,5 +1,6 @@
 package com.jing.forum.controller;
 
+import com.jing.forum.annotation.LoginRequired;
 import com.jing.forum.entity.User;
 import com.jing.forum.service.UserService;
 import com.jing.forum.util.ForumUtil;
@@ -44,11 +45,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @LoginRequired
     @RequestMapping(path="/setting", method= RequestMethod.GET)
     public String getSettingPage() {
         return "/site/setting";
     }
 
+    @LoginRequired
     @RequestMapping(path="/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model) {
         if(headerImage == null) {
