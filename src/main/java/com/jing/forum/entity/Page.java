@@ -63,7 +63,7 @@ public class Page {
      */
     public int getTotal() {
         if(rows % limit == 0) return rows / limit;
-        else return rows / limit;
+        else return rows / limit + 1;
     }
 
     /**
