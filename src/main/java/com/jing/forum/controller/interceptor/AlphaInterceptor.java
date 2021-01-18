@@ -1,4 +1,4 @@
-package com.jing.forum.interceptor;
+package com.jing.forum.controller.interceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

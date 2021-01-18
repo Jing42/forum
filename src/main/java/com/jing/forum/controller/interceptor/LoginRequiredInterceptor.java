@@ -1,4 +1,4 @@
-package com.jing.forum.interceptor;
+package com.jing.forum.controller.interceptor;
 
 import com.jing.forum.annotation.LoginRequired;
 import com.jing.forum.util.HostHolder;

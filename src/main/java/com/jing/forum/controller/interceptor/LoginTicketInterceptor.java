@@ -1,4 +1,4 @@
-package com.jing.forum.interceptor;
+package com.jing.forum.controller.interceptor;
 
 import com.jing.forum.entity.LoginTicket;
 import com.jing.forum.entity.User;

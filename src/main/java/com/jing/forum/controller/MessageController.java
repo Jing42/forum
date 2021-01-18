@@ -128,7 +128,6 @@ public class MessageController {
         if(target == null) {
             return ForumUtil.getJSONString(1, "目标用户不存在！");
         }
-
         Message message = new Message();
         message.setFromId(hostHolder.getUser().getId());
         message.setToId(target.getId());

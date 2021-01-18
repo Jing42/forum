@@ -1,8 +1,8 @@
 package com.jing.forum.config;
 
-import com.jing.forum.interceptor.AlphaInterceptor;
-import com.jing.forum.interceptor.LoginRequiredInterceptor;
-import com.jing.forum.interceptor.LoginTicketInterceptor;
+import com.jing.forum.controller.interceptor.AlphaInterceptor;
+import com.jing.forum.controller.interceptor.LoginRequiredInterceptor;
+import com.jing.forum.controller.interceptor.LoginTicketInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
