@@ -2,6 +2,7 @@ package com.jing.forum.controller;
 
 import com.jing.forum.annotation.LoginRequired;
 import com.jing.forum.entity.User;
+import com.jing.forum.service.LikeService;
 import com.jing.forum.service.UserService;
 import com.jing.forum.util.ForumUtil;
 import com.jing.forum.util.HostHolder;
@@ -44,6 +45,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private LikeService likeService;
 
     @LoginRequired
     @RequestMapping(path="/setting", method= RequestMethod.GET)
@@ -102,6 +106,21 @@ public class UserController {
         } catch (IOException e) {
             logger.error("读取头像失败：" + e.getMessage());
         }
+    }
+
+    @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId, Model model) {
+        User user = userService.findUserById(userId);
+        if(user == null) {
+            throw new RuntimeException("该用户不存在");
+        }
+
+        model.addAttribute("user", user);
+
+        int userLikeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount", userLikeCount);
+
+        return "/site/profile";
     }
 
 }
