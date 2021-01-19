@@ -2,8 +2,10 @@ package com.jing.forum.controller;
 
 
 import com.jing.forum.annotation.LoginRequired;
+import com.jing.forum.entity.Event;
 import com.jing.forum.entity.Page;
 import com.jing.forum.entity.User;
+import com.jing.forum.event.EventProducer;
 import com.jing.forum.service.FollowService;
 import com.jing.forum.service.UserService;
 import com.jing.forum.util.ForumConstant;
@@ -32,6 +34,9 @@ public class FollowController implements ForumConstant {
     @Autowired
     UserService userService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @RequestMapping(path = "/follow", method = RequestMethod.POST)
     @ResponseBody
     @LoginRequired
@@ -39,6 +44,15 @@ public class FollowController implements ForumConstant {
         User user = hostHolder.getUser();
 
         followService.follow(user.getId(), entityType, entityId);
+
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(entityType)
+                .setEntityId(entityId)
+                .setEntityUserId(entityId);
+
+        eventProducer.fireEvent(event);
 
         return ForumUtil.getJSONString(0, "已关注!");
     }
