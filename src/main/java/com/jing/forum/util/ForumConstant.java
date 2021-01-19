@@ -16,4 +16,6 @@ public interface ForumConstant {
 
     int ENTITY_TYPE_COMMENT = 2;
 
+    int ENTITY_TYPE_USER = 3;
+
 }

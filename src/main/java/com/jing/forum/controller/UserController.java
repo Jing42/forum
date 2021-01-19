@@ -2,8 +2,10 @@ package com.jing.forum.controller;
 
 import com.jing.forum.annotation.LoginRequired;
 import com.jing.forum.entity.User;
+import com.jing.forum.service.FollowService;
 import com.jing.forum.service.LikeService;
 import com.jing.forum.service.UserService;
+import com.jing.forum.util.ForumConstant;
 import com.jing.forum.util.ForumUtil;
 import com.jing.forum.util.HostHolder;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +29,7 @@ import java.io.OutputStream;
 
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements ForumConstant{
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -48,6 +50,9 @@ public class UserController {
 
     @Autowired
     private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
 
     @LoginRequired
     @RequestMapping(path="/setting", method= RequestMethod.GET)
@@ -111,14 +116,28 @@ public class UserController {
     @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
     public String getProfilePage(@PathVariable("userId") int userId, Model model) {
         User user = userService.findUserById(userId);
-        if(user == null) {
-            throw new RuntimeException("该用户不存在");
+        if (user == null) {
+            throw new RuntimeException("该用户不存在!");
         }
 
+        // 用户
         model.addAttribute("user", user);
+        // 点赞数量
+        int likeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount", likeCount);
 
-        int userLikeCount = likeService.findUserLikeCount(userId);
-        model.addAttribute("likeCount", userLikeCount);
+        // 关注数量
+        long followeeCount = followService.findFolloweeCount(userId, ENTITY_TYPE_USER);
+        model.addAttribute("followeeCount", followeeCount);
+        // 粉丝数量
+        long followerCount = followService.findFollowerCount(ENTITY_TYPE_USER, userId);
+        model.addAttribute("followerCount", followerCount);
+        // 是否已关注
+        boolean hasFollowed = false;
+        if (hostHolder.getUser() != null) {
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
+        }
+        model.addAttribute("hasFollowed", hasFollowed);
 
         return "/site/profile";
     }
