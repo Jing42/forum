@@ -4,11 +4,14 @@ import com.google.code.kaptcha.Producer;
 import com.jing.forum.entity.User;
 import com.jing.forum.service.UserService;
 import com.jing.forum.util.ForumConstant;
+import com.jing.forum.util.ForumUtil;
+import com.jing.forum.util.RedisKeyUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -24,6 +27,7 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class LoginController implements ForumConstant {
@@ -38,6 +42,9 @@ public class LoginController implements ForumConstant {
 
     @Value("${server.servlet.context-path}")
     private String contextPath;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @RequestMapping(path = "/register", method = RequestMethod.GET)
     public String getRegisterPage() {
@@ -81,6 +88,7 @@ public class LoginController implements ForumConstant {
         }
         return "/site/operate-result";
     }
+/*
 
     @RequestMapping(path="/kaptcha", method=RequestMethod.GET)
     public void getKaptcha(HttpServletResponse response, HttpSession session) {
@@ -97,12 +105,43 @@ public class LoginController implements ForumConstant {
             logger.error("响应验证码失败 " + e.getMessage());
         }
     }
+*/
+@RequestMapping(path="/kaptcha", method=RequestMethod.GET)
+public void getKaptcha(HttpServletResponse response) {
+    String text = kaptchaProducer.createText();
+    BufferedImage image = kaptchaProducer.createImage(text);
+
+    String kaptchaOwner = ForumUtil.generateUUID();
+    Cookie cookie = new Cookie("kaptchaOwner", kaptchaOwner);
+    cookie.setMaxAge(60);
+    cookie.setPath(contextPath);
+    response.addCookie(cookie);
+
+    String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
+    redisTemplate.opsForValue().set(redisKey, text, 60, TimeUnit.SECONDS);
+
+    response.setContentType("image/png");
+    try {
+        ServletOutputStream outputStream = response.getOutputStream();
+        ImageIO.write(image, "png", outputStream);
+    } catch (IOException e) {
+        logger.error("响应验证码失败 " + e.getMessage());
+    }
+}
+
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public String login(String username, String password, String code,
-                        boolean rememberMe, Model model, HttpSession session,
-                        HttpServletResponse response) {
-        String kaptcha = (String) session.getAttribute("kaptcha");
+                        boolean rememberMe, Model model, //HttpSession session,
+                        HttpServletResponse response,
+                        @CookieValue("kaptchaOwner") String kaptchaOwner) {
+        //String kaptcha = (String) session.getAttribute("kaptcha");
+
+        String kaptcha = null;
+        if(StringUtils.isNotBlank(kaptchaOwner)) {
+            String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
+            kaptcha = (String)redisTemplate.opsForValue().get(redisKey);
+        }
         if(StringUtils.isBlank(kaptcha) || StringUtils.isBlank(code) || !kaptcha.equalsIgnoreCase(code)) {
             model.addAttribute("codeMsg", "验证码不正确");
             return "/site/login";
